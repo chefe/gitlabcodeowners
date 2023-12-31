@@ -1,0 +1,127 @@
+#!/bin/sh
+
+set -e
+set -u
+
+installAll() {
+  rm -rf build/ext/bin
+  mkdir -p build/ext/bin
+
+  checkInstall "Go" "1.21.5"
+  checkInstall "GolangCILint" "1.55.2"
+  checkInstall "Gotestsum" "1.11.0"
+  checkInstall "Gomarkdoc" "1.1.0"
+  checkInstall "ShellCheck" "0.9.0"
+}
+
+checkInstall() {
+  name=$1
+  version=$2
+
+  install_path="build/ext"
+
+  if [ -d "${install_path}" ] && [ -f "${install_path}/.${name}_${version}" ]; then
+    "link${name}" "${install_path}" "${version}"
+    return
+  fi
+
+  mkdir -p "${install_path}/tmp/"
+  echo "Install ${name} - ${version}"
+  rm -rf "${install_path}/.${name}_"*
+  "install${name}" "${install_path}" "${version}"
+  touch "${install_path}/.${name}_${version}"
+  rm -rf "${install_path}/tmp"
+}
+
+installGo() {
+  install_path=$1
+  version=$2
+
+  curl -L "https://go.dev/dl/go${version}.linux-amd64.tar.gz" --output "${install_path}/tmp/go.linux-amd64.tar.gz"
+  rm -rf "${install_path}/go"
+  tar xf "${install_path}/tmp/go.linux-amd64.tar.gz" -C "${install_path}"
+
+  linkGo "${install_path}"
+}
+
+linkGo() {
+  install_path=$1
+
+  ln -s "$(readlink -f "${install_path}/go/bin/go")" "${install_path}/bin/go"
+  ln -s "$(readlink -f "${install_path}/go/bin/gofmt")" "${install_path}/bin/gofmt"
+}
+
+installGolangCILint() {
+  install_path=$1
+  version=$2
+
+  curl -L "https://github.com/golangci/golangci-lint/releases/download/v${version}/golangci-lint-${version}-linux-amd64.tar.gz" --output "${install_path}/tmp/golangci-lint.linux-amd64.tar.gz"
+  rm -rf "${install_path}/golangci-lint"
+  tar xf "${install_path}/tmp/golangci-lint.linux-amd64.tar.gz" -C "${install_path}"
+  mv "${install_path}/golangci-lint-${version}-linux-amd64" "${install_path}/golangci-lint"
+
+  linkGolangCILint "${install_path}"
+}
+
+linkGolangCILint() {
+  install_path=$1
+
+  ln -s "$(readlink -f "${install_path}/golangci-lint/golangci-lint")" "${install_path}/bin/golangci-lint"
+}
+
+installGotestsum() {
+  install_path=$1
+  version=$2
+
+  curl -L "https://github.com/gotestyourself/gotestsum/releases/download/v${version}/gotestsum_${version}_linux_amd64.tar.gz" --output "${install_path}/tmp/gotestsum.linux-amd64.tar.gz"
+  rm -rf "${install_path}/gotestsum"
+  mkdir -p "${install_path}/gotestsum"
+  tar xf "${install_path}/tmp/gotestsum.linux-amd64.tar.gz" -C "${install_path}/gotestsum/"
+
+  linkGotestsum "${install_path}"
+}
+
+linkGotestsum() {
+  install_path=$1
+
+  ln -s "$(readlink -f "${install_path}/gotestsum/gotestsum")" "${install_path}/bin/gotestsum"
+}
+
+installGomarkdoc() {
+  install_path=$1
+  version=$2
+
+  curl -L "https://github.com/princjef/gomarkdoc/releases/download/v${version}/gomarkdoc_${version}_linux_amd64.tar.gz" --output "${install_path}/tmp/gomarkdoc.linux-amd64.tar.gz"
+  rm -rf "${install_path}/gomarkdoc"
+  tar xf "${install_path}/tmp/gomarkdoc.linux-amd64.tar.gz" -C "${install_path}"
+  mv "${install_path}/gomarkdoc_${version}_linux_amd64" "${install_path}/gomarkdoc"
+
+  linkGomarkdoc "${install_path}"
+}
+
+linkGomarkdoc() {
+  install_path=$1
+
+  ln -s "$(readlink -f "${install_path}/gomarkdoc/gomarkdoc")" "${install_path}/bin/gomarkdoc"
+}
+
+installShellCheck() {
+  install_path=$1
+  version=$2
+
+  curl -L "https://github.com/koalaman/shellcheck/releases/download/v${version}/shellcheck-v${version}.linux.x86_64.tar.xz" --output "${install_path}/tmp/shellcheck.tar.xz"
+  rm -rf "${install_path}/shellcheck"
+  tar xf "${install_path}/tmp/shellcheck.tar.xz" -C "${install_path}"
+  mv "${install_path}/shellcheck-v${version}" "${install_path}/shellcheck"
+
+  linkShellCheck "${install_path}"
+}
+
+linkShellCheck() {
+  install_path=$1
+
+  ln -s "$(readlink -f "${install_path}/shellcheck/shellcheck")" "${install_path}/bin/shellcheck"
+}
+
+cd "$(dirname "$(readlink -f "$0")")/.."
+installAll

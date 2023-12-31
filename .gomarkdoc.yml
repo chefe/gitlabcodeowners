@@ -1,0 +1,9 @@
+output: "{{.Dir}}/README.md"
+header: |-
+  [![Go Report Card](https://goreportcard.com/badge/github.com/chefe/gitlabcodeowners)](https://goreportcard.com/report/github.com/chefe/gitlabcodeowners)
+  [![GitHub Actions](https://github.com/chefe/gitlabcodeowners/workflows/default/badge.svg)](https://github.com/chefe/gitlabcodeowners/actions/workflows/default.yml?query=branch%3Amain)
+  [![Go Reference](https://pkg.go.dev/badge/github.com/chefe/gitlabcodeowners.svg)](https://pkg.go.dev/github.com/chefe/gitlabcodeowners)
+repository:
+  url: https://github.com/chefe/gitlabcodeowners
+  defaultBranch: main
+  path: /

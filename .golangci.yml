@@ -1,0 +1,92 @@
+linters-settings:
+  depguard:
+    rules:
+      main:
+        list-mode: strict
+        files:
+          - $all
+          - "!$test"
+          - "!**/pattern.go"
+          - "!**/testhelper/helper.go"
+        allow:
+          - $gostd
+
+      tests:
+        list-mode: strict
+        files:
+          - $test
+        allow:
+          - $gostd
+          - github.com/chefe/gitlabcodeowners/testhelper
+
+      pattern:
+        list-mode: strict
+        files:
+          - "**/pattern.go"
+        allow:
+          - $gostd
+          - github.com/bmatcuk/doublestar/v4
+
+      testhelper:
+        list-mode: strict
+        files:
+          - "**/testhelper/helper.go"
+        allow:
+          - $gostd
+          - github.com/go-test/deep
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+      - experimental
+      - opinionated
+
+  misspell:
+    locale: US
+
+  nolintlint:
+    allow-unused: false
+    require-explanation: true
+    require-specific: true
+
+linters:
+  enable-all: true
+  disable:
+    # disable deprecated linters
+    - nosnakecase
+    - ifshort
+    - interfacer
+    - golint
+    - deadcode
+    - exhaustivestruct
+    - scopelint
+    - structcheck
+    - varcheck
+    - maligned
+
+    # disable `testpackage` linter because white-box tests are used
+    - testpackage
+
+issues:
+  exclude-use-default: false
+
+  exclude-rules:
+    # disable funlen linter for test funcs
+    - source: ^func\ Test.*$
+      path: _test\.go
+      linters:
+        - funlen
+
+    # disable lll linter for long strings in test funcs
+    - source: ^.*strings\.NewReader\(.*$
+      path: _test\.go
+      linters:
+        - lll
+    
+    # disable varnamelen linter for tt variable in test funcs
+    - source: ^\s*tt := tt$
+      path: _test\.go
+      linters:
+        - varnamelen
